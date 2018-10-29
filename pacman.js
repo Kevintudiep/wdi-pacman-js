@@ -1,7 +1,7 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
-
+var power_pellets = 4;
 
 // Define your ghosts here
 var inky = {
@@ -53,20 +53,32 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives);
+  console.log('Score: ' + score + '     Lives: ' + lives  + '\n\n\nPower-Pellets: ' + power_pellets);
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
   console.log('(d) Eat Dot');
+  console.log('(p) Eat Power-Pellet');
+  for (var i = 0; i < 4; i++) {
+    console.log("(" + ghosts[i].menu_option + ") Eat " + ghosts[i].name + displayEdible(ghosts[i]))
+  }
   console.log('(q) Quit');
 }
+
 
 function displayPrompt() {
   // process.stdout.write is similar to console.log except it doesn't add a new line after the text
   process.stdout.write('\nWaka Waka :v '); // :v is the Pac-Man emoji.
 }
 
+function displayEdible(ghost) {
+  if (ghost.edible === false) {
+    return ("  (inedible)");
+  } else {
+    return ("  (edible)");
+  }
+}
 
 // Menu Options
 function eatDot() {
@@ -74,6 +86,38 @@ function eatDot() {
   score += 10;
 }
 
+function eatGhost(ghost) {
+  if (ghost.edible === false) {
+    lives -=1;
+    console.log(`\n ${ghost.name} killed Pac-Man!`);
+    gameOver();
+  } else {
+    score += 200;
+    ghost.edible = false;
+    console.log(`\nChomp! Pac-Man savagely feasted on ${ghost.name}`);
+  }
+}
+
+
+function eatPowerPellet() {
+  if (power_pellets > 0) {
+    score += 50;
+    for (var i = 0; i < 4; i++) {
+      ghosts[i].edible = true;
+    }
+    power_pellets -= 1
+  }
+  else {
+    console.log("No more Power-Pellets left!");
+  }
+}
+
+
+function gameOver() {
+  if (lives < 0) {
+    process.exit();
+  }
+}
 
 // Process Player's Input
 function processInput(key) {
@@ -84,6 +128,21 @@ function processInput(key) {
       break;
     case 'd':
       eatDot();
+      break;
+    case 'p':
+      eatPowerPellet();
+      break;
+    case '1':
+      eatGhost(ghosts[0]);
+      break;
+    case '2':
+      eatGhost(ghosts[1]);
+      break;
+    case '3':
+      eatGhost(ghosts[2]);
+      break;
+    case '4':
+      eatGhost(ghosts[3]);
       break;
     default:
       console.log('\nInvalid Command!');
